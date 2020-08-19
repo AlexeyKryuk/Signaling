@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Collider2D))]
 public class Wandering : MonoBehaviour
 {
     [SerializeField] private float _speed;

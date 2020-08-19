@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Coin : MonoBehaviour
 {
-    static private int _count = 0;
+    private static int _count = 0;
 
     public static int Count { get => _count; private set => _count = value; }
 

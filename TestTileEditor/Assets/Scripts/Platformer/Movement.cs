@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Animator))]
 public class Movement : MonoBehaviour
 {
     [SerializeField] private float _speed;
@@ -11,21 +12,20 @@ public class Movement : MonoBehaviour
     private Vector2 _input;
     private Rigidbody2D _rb;
     private Animator _animator;
-    private SpriteRenderer _spriteRenderer;
-    private bool jump;
+    private bool _jump;
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
-        _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
     {
-        if (Input.GetKey(KeyCode.Space) && jump)
+        if (Input.GetKey(KeyCode.Space) && _jump)
         {
             _currentJumpSpeed = _maxJumpSpeed;
+            
             if (Input.GetAxis("Horizontal") > 0)
                 _animator.SetBool("JumpRight", true);
             else
@@ -47,7 +47,7 @@ public class Movement : MonoBehaviour
     {
         if (coll.transform.tag == "Ground")
         {
-            jump = true;
+            _jump = true;
         }
     }
 
@@ -55,7 +55,7 @@ public class Movement : MonoBehaviour
     {
         if (coll.transform.tag == "Ground")
         {
-            jump = false;
+            _jump = false;
         }
     }
 

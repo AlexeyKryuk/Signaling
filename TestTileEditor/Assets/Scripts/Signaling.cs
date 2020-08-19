@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class Signaling : MonoBehaviour
 {
     private AudioSource _audio;
-    private bool _isInside;
     private float _deltaVolume;
+    private Coroutine _increaseCoroutine;
 
     private void Awake()
     {
@@ -15,44 +16,44 @@ public class Signaling : MonoBehaviour
 
     private void Start()
     {
-        _deltaVolume = -0.01f;
-        _isInside = false;
+        _deltaVolume = -0.002f;
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerExit(Collider other)
     {
         if (other.TryGetComponent<Player>(out Player player))
         {
-            _deltaVolume *= -1f;
-
-            if (!_isInside)
-            {
-                StartCoroutine(PlaySignal());
-            }
+            PlaySignal();
         }
     }
 
-    private IEnumerator PlaySignal()
+    private void PlaySignal()
     {
-        _isInside = true;
-        _audio.volume += _deltaVolume;
+        _deltaVolume *= -1f;
 
-        if (_audio.volume > 0.5f)
+        if (_increaseCoroutine == null)
+            _increaseCoroutine = StartCoroutine(IncreaseSignal());
+    }
+
+    private IEnumerator IncreaseSignal()
+    {
+        while (true)
         {
-            _audio.volume = 0.5f;
+            _audio.volume += _deltaVolume;
+            yield return new WaitForEndOfFrame();
 
-            _isInside = false;
-            yield break;
+            if (_audio.volume >= 0.5f)
+            {
+                _audio.volume = 0.5f;
+                _increaseCoroutine = null;
+                yield break;
+            }
+            else if (_audio.volume <= 0f)
+            {
+                _audio.volume = 0f;
+                _increaseCoroutine = null;
+                yield break;
+            }
         }
-        else if (_audio.volume < 0.01f)
-        {
-            _audio.volume = 0f;
-
-            _isInside = false;
-            yield break;
-        }
-        
-        yield return new WaitForSeconds(0.1f);
-        StartCoroutine(PlaySignal());
     }
 }
